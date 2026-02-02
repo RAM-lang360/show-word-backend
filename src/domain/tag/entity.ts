@@ -7,7 +7,7 @@ export class Tag {
         public readonly id: number | null, // 新規作成時はnull
         public readonly name: string,
     ) {
-        // 【ドメインルール】タイトルは空であってはならない
+        // 【ドメインルール】タグネームは空であってはならない
         if (name.length === 0) {
             throw new Error("タグネームを入力してください");
         }
