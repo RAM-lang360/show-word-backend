@@ -1,0 +1,25 @@
+{
+  "name": "show-word-backend",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "studio": "bun prisma studio",
+    "migrate": "bun prisma migrate dev",
+    "generate": "bun prisma generate",
+    "test": "vitest",
+    "test:watch": "vitest --watch"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "dotenv": "^17.2.3",
+    "git": "^0.1.5",
+    "hono": "^4.11.7",
+    "pg": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/pg": "^8.16.0",
+    "prisma": "^7.3.0",
+    "vitest": "^4.0.18"
+  }
+}

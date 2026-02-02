@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Article {
+  id       Int      @id @default(autoincrement())
+  title     String
+  explanation   String
+  published Boolean  @default(false)
+  tags   ArticleOnTags[]
+  actors   ArticleOnActors[]
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  articles ArticleOnTags[]
+}
+
+model Actor {
+  id       Int      @id @default(autoincrement())
+  name     String
+  articles ArticleOnActors[]
+}
+
+model ArticleOnTags {
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+  tag       Tag     @relation(fields: [tagId], references: [id])
+  tagId     Int
+
+  @@id([articleId, tagId]) //ArticleとTagの組み合わせで一意性を保証
+}
+
+model ArticleOnActors {
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+  actor     Actor   @relation(fields: [actorId], references: [id])
+  actorId   Int
+
+  @@id([articleId, actorId]) //ArticleとActorの組み合わせで一意性を保証
+}
