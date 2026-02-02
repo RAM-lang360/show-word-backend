@@ -9,7 +9,7 @@ export class PrismaArticleRepository implements ArticleRepository {
         return new Article(
             data.id,
             data.title,
-            data.content,
+            data.explanation,
             data.published
         );
     }

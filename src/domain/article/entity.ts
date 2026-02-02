@@ -7,7 +7,7 @@ export class Article {
         public readonly id: number | null, // 新規作成時はnull
         public readonly title: string,
         public readonly explanation: string,
-        public readonly createdAt: Date
+        public readonly published: boolean
     ) {
         // 【ドメインルール】タイトルは空であってはならない
         if (title.length === 0) {
