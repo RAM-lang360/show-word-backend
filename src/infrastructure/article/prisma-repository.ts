@@ -32,7 +32,7 @@ export class PrismaArticleRepository implements ArticleRepository {
     }
 
     async save(article: Article): Promise<void> {
-        const record = await prisma.article.create({
+        await prisma.article.create({
             data: {
                 title: article.title,
                 explanation: article.explanation,
