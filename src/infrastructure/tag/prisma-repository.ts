@@ -1,9 +1,9 @@
-import { prisma } from '../../../lib/prisma'
+import { PrismaClient } from '../../../generated/prisma/client';
 import { TagRepository } from '../../domain/tag/repository';
 import { Tag } from '../../domain/tag/entity';
 
 export class PrismaTagRepository implements TagRepository {
-
+    constructor(private readonly prisma: PrismaClient) { }
     //domainのTagエンティティに変換するメソッド、もしDBのコラムが変更されてもここだけかえればそれより上層は大丈夫
     private toEntity(data: any): Tag {
         return new Tag(
@@ -13,12 +13,12 @@ export class PrismaTagRepository implements TagRepository {
     }
 
     async findAll(): Promise<Tag[]> {
-        const record = await prisma.tag.findMany();
+        const record = await this.prisma.tag.findMany();
         return record.map(item => this.toEntity(item));
     }
 
     async findById(id: number): Promise<Tag | null> {
-        const record = await prisma.tag.findUnique({
+        const record = await this.prisma.tag.findUnique({
             where: { id }
         });
         if (!record) {
@@ -28,7 +28,7 @@ export class PrismaTagRepository implements TagRepository {
     }
 
     async save(tag: Tag): Promise<void> {
-        await prisma.tag.create({
+        await this.prisma.tag.create({
             data: {
                 name: tag.name,
             }
@@ -36,7 +36,7 @@ export class PrismaTagRepository implements TagRepository {
     }
 
     async delete(id: number): Promise<void> {
-        await prisma.tag.delete({
+        await this.prisma.tag.delete({
             where: { id }
         });
     }

@@ -1,12 +1,12 @@
 import { PrismaActorRepository } from '../../../infrastructure/actor/prisma-repository';
 import { Actor } from '../../../domain/actor/entity';
-import { prisma } from '../../../../lib/prisma';
+import { prisma as testPrisma } from '../../test-db';
 
 describe('PrismaActorRepository', () => {
     let repository: PrismaActorRepository;
-
+    const prisma = testPrisma;
     beforeAll(() => {
-        repository = new PrismaActorRepository();
+        repository = new PrismaActorRepository(prisma);
     });
 
     beforeEach(async () => {

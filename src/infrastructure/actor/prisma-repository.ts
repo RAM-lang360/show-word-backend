@@ -1,8 +1,9 @@
-import { prisma } from '../../../lib/prisma'
+import { PrismaClient } from '../../../generated/prisma/client';
 import { ActorRepository } from '../../domain/actor/repository';
 import { Actor } from '../../domain/actor/entity';
 
 export class PrismaActorRepository implements ActorRepository {
+    constructor(private readonly prisma: PrismaClient) { }
     private toEntity(data: any): Actor {
         return new Actor(
             data.id,
@@ -11,12 +12,12 @@ export class PrismaActorRepository implements ActorRepository {
     }
 
     async findAll(): Promise<Actor[]> {
-        const record = await prisma.actor.findMany();
+        const record = await this.prisma.actor.findMany();
         return record.map(item => this.toEntity(item));
     }
 
     async findById(id: number): Promise<Actor | null> {
-        const record = await prisma.actor.findUnique({
+        const record = await this.prisma.actor.findUnique({
             where: { id }
         });
         if (!record) {
@@ -26,7 +27,7 @@ export class PrismaActorRepository implements ActorRepository {
     }
 
     async save(actor: Actor): Promise<void> {
-        const record = await prisma.actor.create({
+        const record = await this.prisma.actor.create({
             data: {
                 name: actor.name,
             }
@@ -34,7 +35,7 @@ export class PrismaActorRepository implements ActorRepository {
     }
 
     async delete(id: number): Promise<void> {
-        await prisma.actor.delete({
+        await this.prisma.actor.delete({
             where: { id }
         });
     }
