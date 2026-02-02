@@ -1,12 +1,13 @@
 import { PrismaArticleRepository } from '../../../infrastructure/article/prisma-repository';
 import { Article } from '../../../domain/article/entity';
-import { prisma } from '../../../../lib/prisma';
+import { prisma as testPrisma } from '../../test-db';
+import { TestAPI } from 'vitest';
 
 describe('PrismaArticleRepository', () => {
     let repository: PrismaArticleRepository;
-
+    const prisma = testPrisma;
     beforeAll(() => {
-        repository = new PrismaArticleRepository();
+        repository = new PrismaArticleRepository(prisma);
     });
 
     beforeEach(async () => {

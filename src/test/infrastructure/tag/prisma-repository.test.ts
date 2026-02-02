@@ -1,12 +1,12 @@
 import { PrismaTagRepository } from '../../../infrastructure/tag/prisma-repository';
 import { Tag } from '../../../domain/tag/entity';
-import { prisma } from '../../../../lib/prisma';
+import { prisma as testPrisma } from '../../test-db';
 
 describe('PrismaTagRepository', () => {
     let repository: PrismaTagRepository;
-
+    const prisma = testPrisma;
     beforeAll(() => {
-        repository = new PrismaTagRepository();
+        repository = new PrismaTagRepository(prisma);
     });
 
     beforeEach(async () => {

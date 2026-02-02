@@ -1,9 +1,9 @@
-import { prisma } from '../../../lib/prisma'
+import { PrismaClient } from '../../../generated/prisma/client';
 import { ArticleRepository } from '../../domain/article/repository';
 import { Article } from '../../domain/article/entity';
 
 export class PrismaArticleRepository implements ArticleRepository {
-
+    constructor(private readonly prisma: PrismaClient) { }
     //domainのArticleエンティティに変換するメソッド、もしDBのコラムが変更されてもここだけかえればそれより上層は大丈夫
     private toEntity(data: any): Article {
         return new Article(
@@ -15,14 +15,14 @@ export class PrismaArticleRepository implements ArticleRepository {
     }
 
     async findAll(): Promise<Article[]> {
-        const record = await prisma.article.findMany({
+        const record = await this.prisma.article.findMany({
             where: { published: true }
         });
         return record.map(item => this.toEntity(item));
     }
 
     async findById(id: number): Promise<Article | null> {
-        const record = await prisma.article.findUnique({
+        const record = await this.prisma.article.findUnique({
             where: { id }
         });
         if (!record) {
@@ -32,7 +32,7 @@ export class PrismaArticleRepository implements ArticleRepository {
     }
 
     async save(article: Article): Promise<void> {
-        await prisma.article.create({
+        await this.prisma.article.create({
             data: {
                 title: article.title,
                 explanation: article.explanation,
@@ -42,7 +42,7 @@ export class PrismaArticleRepository implements ArticleRepository {
     }
 
     async delete(id: number): Promise<void> {
-        await prisma.article.delete({
+        await this.prisma.article.delete({
             where: { id }
         });
     }
