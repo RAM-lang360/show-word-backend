@@ -1,6 +1,7 @@
 import { PrismaActorRepository } from '../../../infrastructure/actor/prisma-repository';
 import { Actor } from '../../../domain/actor/entity';
 import { prisma as testPrisma } from '../../test-db';
+import { clearAllTestData } from '../../factory/articleFactory';
 
 describe('PrismaActorRepository', () => {
     let repository: PrismaActorRepository;
@@ -10,15 +11,13 @@ describe('PrismaActorRepository', () => {
     });
 
     beforeEach(async () => {
-        // テスト前にActorテーブルをクリーンアップ
-        await prisma.articleOnActors.deleteMany();
-        await prisma.actor.deleteMany();
+        // テスト前に全テーブルをクリーンアップ
+        await clearAllTestData();
     });
 
     afterAll(async () => {
         // テスト終了後にクリーンアップとコネクション切断
-        await prisma.articleOnActors.deleteMany();
-        await prisma.actor.deleteMany();
+        await clearAllTestData();
         await prisma.$disconnect();
     });
 
