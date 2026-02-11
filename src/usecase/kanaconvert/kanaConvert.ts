@@ -9,6 +9,10 @@ export class KanaConvertInteractor implements KanaConvertUsecase {
     }
 
     async convert(input: string): Promise<string> {
-        return await this.kuroshiro.convert(input, { to: 'hiragana' });
+        const converted = await this.kuroshiro.convert(input, { to: 'hiragana' });
+
+        return converted.replace(/[\u30a1-\u30f6]/g, (match) => {
+            return String.fromCharCode(match.charCodeAt(0) - 0x60);
+        });
     }
 }

@@ -46,4 +46,8 @@ export class PrismaArticleRepository implements ArticleRepository {
             where: { id }
         });
     }
+    // ひらがなから全体検索をするメソッド
+    async findByKeyword(keyword: string): Promise<Article[]> {
+        return [];
+    }
 }   

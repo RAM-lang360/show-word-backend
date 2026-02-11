@@ -23,6 +23,7 @@ import {
 // モックリポジトリの作成
 const createMockArticleRepository = (articles: Article[]): ArticleRepository => ({
     findAll: vi.fn().mockResolvedValue(articles),
+    findByKeyword: vi.fn().mockResolvedValue(articles),
     findById: vi.fn().mockResolvedValue(null),
     save: vi.fn().mockResolvedValue(undefined),
     delete: vi.fn().mockResolvedValue(undefined),
