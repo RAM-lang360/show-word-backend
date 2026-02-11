@@ -24,6 +24,9 @@ webArticle.get('/all_tag', async (c) => {
     return c.json({ message: "This is all tags", data: all_tags })
 })
 
+webArticle.get('/search_by_everything', async (c) => {
+    
+})
 
 
 export default webArticle
