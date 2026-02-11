@@ -28,7 +28,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Install pg_bigm in CI
+        run:
+          docker exec ${{ job.services.postgres.id }} apt-get update
+          docker exec ${{ job.services.postgres.id }} apt-get install -y postgresql-15-pg-bigm
+          docker exec ${{ job.services.postgres.id }} psql -U user -d test_db -c "CREATE EXTENSION pg_bigm;"
 
+          
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
