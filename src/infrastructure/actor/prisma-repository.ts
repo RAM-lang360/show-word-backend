@@ -7,7 +7,8 @@ export class PrismaActorRepository implements ActorRepository {
     private toEntity(data: any): Actor {
         return new Actor(
             data.id,
-            data.name,
+            data.actor_name,
+            data.actor_kana,
         );
     }
 
@@ -29,7 +30,8 @@ export class PrismaActorRepository implements ActorRepository {
     async save(actor: Actor): Promise<void> {
         const record = await this.prisma.actor.create({
             data: {
-                name: actor.name,
+                actor_name: actor.actor_name,
+                actor_kana: actor.actor_kana,
             }
         });
     }

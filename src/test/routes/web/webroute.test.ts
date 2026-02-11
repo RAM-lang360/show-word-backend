@@ -155,8 +155,8 @@ describe('routes/web/article', () => {
 
         it('アクター一覧を取得できること', async () => {
             const mockActors = [
-                new Actor(1, 'アクター1'),
-                new Actor(2, 'アクター2'),
+                new Actor(1, '山崎桃', 'ヤマザキモモ'),
+                new Actor(2, '猛武蔵', 'モウムサシ'),
             ]
             const repos = createDefaultMockRepos()
             repos.actorRepo = createMockActorRepository(mockActors)
