@@ -23,15 +23,16 @@ describe('PrismaActorRepository', () => {
 
     describe('save', () => {
         it('Actorを保存できること', async () => {
-            const actor = new Actor(null, 'テスト俳優');
+            const actor = new Actor(null, '山崎桃', 'ヤマザキモモ');
 
             await repository.save(actor);
 
             const savedActors = await prisma.actor.findMany({
-                where: { name: 'テスト俳優' }
+                where: { actor_name: '山崎桃' }
             });
             expect(savedActors).toHaveLength(1);
-            expect(savedActors[0].name).toBe('テスト俳優');
+            expect(savedActors[0].actor_name).toBe('山崎桃');
+            expect(savedActors[0].actor_kana).toBe('ヤマザキモモ');
         });
     });
 
@@ -40,16 +41,16 @@ describe('PrismaActorRepository', () => {
             // テストデータを準備
             await prisma.actor.createMany({
                 data: [
-                    { name: '俳優A' },
-                    { name: '俳優B' },
-                    { name: '俳優C' },
+                    { actor_name: '俳優A', actor_kana: 'ハイユウA' },
+                    { actor_name: '俳優B', actor_kana: 'ハイユウB' },
+                    { actor_name: '俳優C', actor_kana: 'ハイユウC' },
                 ]
             });
 
             const actors = await repository.findAll();
 
             expect(actors).toHaveLength(3);
-            expect(actors.map(a => a.name)).toEqual(
+            expect(actors.map(a => a.actor_name)).toEqual(
                 expect.arrayContaining(['俳優A', '俳優B', '俳優C'])
             );
         });
@@ -65,14 +66,15 @@ describe('PrismaActorRepository', () => {
     describe('findById', () => {
         it('指定したIDのActorを取得できること', async () => {
             const created = await prisma.actor.create({
-                data: { name: '検索対象俳優' }
+                data: { actor_name: '検索対象俳優', actor_kana: 'ケンサクタイショウハイユウ' }
             });
 
             const actor = await repository.findById(created.id);
 
             expect(actor).not.toBeNull();
             expect(actor?.id).toBe(created.id);
-            expect(actor?.name).toBe('検索対象俳優');
+            expect(actor?.actor_name).toBe('検索対象俳優');
+            expect(actor?.actor_kana).toBe('ケンサクタイショウハイユウ');
         });
 
         it('存在しないIDの場合、nullを返すこと', async () => {
@@ -85,7 +87,7 @@ describe('PrismaActorRepository', () => {
     describe('delete', () => {
         it('指定したIDのActorを削除できること', async () => {
             const created = await prisma.actor.create({
-                data: { name: '削除対象俳優' }
+                data: { actor_name: '削除対象俳優', actor_kana: 'サクジョタイショウハイユウ' }
             });
 
             await repository.delete(created.id);

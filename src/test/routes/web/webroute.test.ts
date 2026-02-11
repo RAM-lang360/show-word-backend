@@ -23,6 +23,7 @@ import {
 // モックリポジトリの作成
 const createMockArticleRepository = (articles: Article[]): ArticleRepository => ({
     findAll: vi.fn().mockResolvedValue(articles),
+    findByKeyword: vi.fn().mockResolvedValue(articles),
     findById: vi.fn().mockResolvedValue(null),
     save: vi.fn().mockResolvedValue(undefined),
     delete: vi.fn().mockResolvedValue(undefined),
@@ -155,8 +156,8 @@ describe('routes/web/article', () => {
 
         it('アクター一覧を取得できること', async () => {
             const mockActors = [
-                new Actor(1, 'アクター1'),
-                new Actor(2, 'アクター2'),
+                new Actor(1, '山崎桃', 'ヤマザキモモ'),
+                new Actor(2, '猛武蔵', 'モウムサシ'),
             ]
             const repos = createDefaultMockRepos()
             repos.actorRepo = createMockActorRepository(mockActors)
@@ -227,9 +228,9 @@ describe.sequential('routes/web/article 統合テスト', () => {
                 tags: ['TypeScript'],
                 actors: ['山田太郎']
             })
-            console.log('作成した記事1:', JSON.stringify(article1, null, 2))
-            console.log('作成した記事2:', JSON.stringify(article2, null, 2))
-            console.log('作成した記事3:', JSON.stringify(article3, null, 2))
+            // console.log('作成した記事1:', JSON.stringify(article1, null, 2))
+            // console.log('作成した記事2:', JSON.stringify(article2, null, 2))
+            // console.log('作成した記事3:', JSON.stringify(article3, null, 2))
 
             const app = createIntegrationTestApp()
 
@@ -239,7 +240,7 @@ describe.sequential('routes/web/article 統合テスト', () => {
             // Assert
             expect(response.status).toBe(200)
             const json = await response.json() as { message: string, data: Article[] }
-            console.log('レスポンス:', JSON.stringify(json, null, 2))
+            // console.log('レスポンス:', JSON.stringify(json, null, 2))
             expect(json.data).toHaveLength(3)
             expect(json.data.map(a => a.title)).toContain('統合テスト記事1')
             expect(json.data.map(a => a.title)).toContain('統合テスト記事2')
@@ -260,7 +261,7 @@ describe.sequential('routes/web/article 統合テスト', () => {
 
             // Assert
             const json = await response.json() as { message: string, data: Article[] }
-            console.log('公開記事のみのレスポンス:', JSON.stringify(json, null, 2))
+            // ('公開記事のみのレスポンス:', JSON.stringify(json, null, 2))
             expect(json.data).toHaveLength(1)
             expect(json.data[0].title).toBe('公開記事')
         })
@@ -271,7 +272,7 @@ describe.sequential('routes/web/article 統合テスト', () => {
             // Arrange
             await createTagFactory('JavaScript')
             await createTagFactory('TypeScript')
-            console.log('タグを2件作成しました')
+            // console.log('タグを2件作成しました')
 
             const app = createIntegrationTestApp()
 
@@ -281,7 +282,7 @@ describe.sequential('routes/web/article 統合テスト', () => {
             // Assert
             expect(response.status).toBe(200)
             const json = await response.json() as { message: string, data: Tag[] }
-            console.log('タグレスポンス:', JSON.stringify(json, null, 2))
+            // console.log('タグレスポンス:', JSON.stringify(json, null, 2))
             expect(json.data).toHaveLength(2)
         })
     })
@@ -291,7 +292,7 @@ describe.sequential('routes/web/article 統合テスト', () => {
             // Arrange
             await createActorFactory('テスト俳優A')
             await createActorFactory('テスト俳優B')
-            console.log('アクターを2件作成しました')
+            // console.log('アクターを2件作成しました')
 
             const app = createIntegrationTestApp()
 
@@ -301,7 +302,7 @@ describe.sequential('routes/web/article 統合テスト', () => {
             // Assert
             expect(response.status).toBe(200)
             const json = await response.json() as { message: string, data: Actor[] }
-            console.log('アクターレスポンス:', JSON.stringify(json, null, 2))
+            // console.log('アクターレスポンス:', JSON.stringify(json, null, 2))
             expect(json.data).toHaveLength(2)
         })
     })

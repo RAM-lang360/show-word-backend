@@ -26,7 +26,10 @@ export async function createTagFactory(name?: string) {
  */
 export async function createActorFactory(name?: string) {
     return prisma.actor.create({
-        data: { name: name ?? `テストアクター${Date.now()}` }
+        data: {
+            actor_name: name ?? `テストアクター${Date.now()}`,
+            actor_kana: `テストアクターカナ${Date.now()}`
+        }
     })
 }
 
@@ -55,7 +58,7 @@ export const createArticleFactory = async (overrides: {
             actors: {
                 create: overrides.actors?.map((name) => ({
                     actor: {
-                        create: { name },
+                        create: { actor_name: name, actor_kana: `${name}カナ` },
                     },
                 })) ?? [],
             },

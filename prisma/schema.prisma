@@ -31,7 +31,8 @@ model Tag {
 
 model Actor {
   id       Int      @id @default(autoincrement())
-  name     String
+  actor_name     String
+  actor_kana     String
   articles ArticleOnActors[]
 }
 

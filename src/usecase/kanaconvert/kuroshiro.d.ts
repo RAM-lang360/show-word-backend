@@ -1,0 +1,18 @@
+// kuroshiro.d.ts
+declare module 'kuroshiro' {
+    export default class Kuroshiro {
+        constructor();
+        init(analyzer: any): Promise<void>;
+        convert(text: string, options?: {
+            to?: 'hiragana' | 'katakana' | 'romaji';
+            mode?: 'normal' | 'spaced' | 'okurigana' | 'furigana';
+            delimiter?: string;
+        }): Promise<string>;
+    }
+}
+
+declare module 'kuroshiro-analyzer-kuromoji' {
+    export default class KuromojiAnalyzer {
+        constructor(options?: { dictPath?: string });
+    }
+}
