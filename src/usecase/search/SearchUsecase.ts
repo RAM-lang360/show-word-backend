@@ -1,4 +1,4 @@
-import { Article } from "../domain/article/entity";
+import { Article } from "../../domain/article/entity";
 
 // 1. 入力の型（Input Boundary）
 // 検索に必要な情報をまとめる。今はキーワードだけですが、

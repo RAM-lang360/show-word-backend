@@ -1,6 +1,6 @@
-import { Article } from "../domain/article/entity";
-import { ArticleRepository } from "../domain/article/repository";
-import { SearchByKeywordUsecase, SearchByKeywordInput } from "./SearchByKeywordUsecase";
+import { Article } from "../../domain/article/entity";
+import { ArticleRepository } from "../../domain/article/repository";
+import { SearchByKeywordUsecase, SearchByKeywordInput } from "./SearchUsecase";
 
 // UseCase用のインターフェースを実装する
 export class SearchByKeywordInteractor implements SearchByKeywordUsecase {
