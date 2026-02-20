@@ -2,7 +2,7 @@
 FROM oven/bun:latest
 
 WORKDIR /app
-COPY . .\
+COPY . .
 RUN apt-get update && apt-get install -y git
 RUN bun install
 
