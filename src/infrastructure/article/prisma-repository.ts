@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../../generated/prisma/client';
+import { Prisma, PrismaClient } from '../../../generated/prisma/client';
 import { ArticleRepository } from '../../domain/article/repository';
 import { Article } from '../../domain/article/entity';
 
@@ -57,47 +57,42 @@ export class PrismaArticleRepository implements ArticleRepository {
             return [];
         }
 
-        const toCrossFieldOrCondition = (token: string) => ({
-            OR: [
-                { title: { contains: token, mode: 'insensitive' as const } },
-                { explanation: { contains: token, mode: 'insensitive' as const } },
-                {
-                    tags: {
-                        some: {
-                            tag: {
-                                name: { contains: token, mode: 'insensitive' as const }
-                            }
-                        }
-                    }
-                },
-                {
-                    actors: {
-                        some: {
-                            actor: {
-                                actor_name: { contains: token, mode: 'insensitive' as const }
-                            }
-                        }
-                    }
-                },
-                {
-                    actors: {
-                        some: {
-                            actor: {
-                                actor_kana: { contains: token, mode: 'insensitive' as const }
-                            }
-                        }
-                    }
-                }
-            ]
+        const tokenConditions = tokens.map((token) => {
+            const likePattern = `%${token}%`;
+            return Prisma.sql`
+                (
+                    a.title ILIKE ${likePattern}
+                    OR a.explanation ILIKE ${likePattern}
+                    OR EXISTS (
+                        SELECT 1
+                        FROM "ArticleOnTags" aot
+                        INNER JOIN "Tag" t ON t.id = aot."tagId"
+                        WHERE aot."articleId" = a.id
+                          AND t.name ILIKE ${likePattern}
+                    )
+                    OR EXISTS (
+                        SELECT 1
+                        FROM "ArticleOnActors" aoa
+                        INNER JOIN "Actor" ac ON ac.id = aoa."actorId"
+                        WHERE aoa."articleId" = a.id
+                          AND (
+                              ac.actor_name ILIKE ${likePattern}
+                              OR ac.actor_kana ILIKE ${likePattern}
+                          )
+                    )
+                )
+            `;
         });
 
-        const records = await this.prisma.article.findMany({
-            where: {
-                published: true,
-                AND: tokens.map((token) => toCrossFieldOrCondition(token))
-            },
-            orderBy: { id: 'desc' }
-        });
+        const records = await this.prisma.$queryRaw<
+            { id: number; title: string; explanation: string; published: boolean }[]
+        >(Prisma.sql`
+            SELECT a.id, a.title, a.explanation, a.published
+            FROM "Article" a
+            WHERE a.published = true
+                            AND ${Prisma.join(tokenConditions, ' AND ')}
+            ORDER BY a.id DESC
+        `);
 
         return records.map((item) => this.toEntity(item));
     }

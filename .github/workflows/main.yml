@@ -12,7 +12,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:latest
+        image: postgres:15
         env:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
@@ -28,11 +28,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Install pg_bigm in CI
-        run:
-          docker exec ${{ job.services.postgres.id }} apt-get update
-          docker exec ${{ job.services.postgres.id }} apt-get install -y postgresql-15-pg-bigm
-          docker exec ${{ job.services.postgres.id }} psql -U user -d test_db -c "CREATE EXTENSION pg_bigm;"
+        run: |
+          docker exec -u root ${{ job.services.postgres.id }} bash -lc "apt-get update && apt-get install -y postgresql-15-pg-bigm"
+          docker exec ${{ job.services.postgres.id }} psql -U user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_bigm;"
 
           
       - name: Setup Bun
@@ -47,8 +47,8 @@ jobs:
       - name: Generate Prisma Client
         run: bun x prisma generate
 
-      - name: Push DB Schema
-        run: bun x prisma db push
+      - name: Apply Prisma Migrations
+        run: bun x prisma migrate deploy
 
       - name: Run Vitest
         run: bun x vitest run
