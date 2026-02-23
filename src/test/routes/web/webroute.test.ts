@@ -181,6 +181,51 @@ describe('routes/web/article', () => {
             expect(response.status).toBe(404)
         })
     })
+
+    describe('GET /search_by_everything', () => {
+        it('キーワードで検索できること', async () => {
+            const mockArticles = [
+                new Article(1, 'TypeScript記事', '説明', true),
+                new Article(2, 'Prisma記事', '説明', true),
+            ]
+            const repos = createDefaultMockRepos()
+            repos.articleRepo = createMockArticleRepository(mockArticles)
+            const app = createTestApp(repos)
+
+            const response = await app.request('/search_by_everything?q=TypeScript')
+
+            expect(response.status).toBe(200)
+            const json = await response.json() as { message: string, data: Article[] }
+            expect(json.message).toBe('This is searched articles')
+            expect(json.data).toHaveLength(2)
+            expect(repos.articleRepo.findByKeyword).toHaveBeenCalledWith('TypeScript')
+        })
+
+        it('キーワードが空の場合は400が返ること', async () => {
+            const repos = createDefaultMockRepos()
+            const app = createTestApp(repos)
+
+            const response = await app.request('/search_by_everything')
+
+            expect(response.status).toBe(400)
+            const json = await response.json() as { message: string, data: Article[] }
+            expect(json.message).toBe('query "q" is required')
+            expect(json.data).toEqual([])
+        })
+
+        it('検索結果が0件の場合はないことを返すこと', async () => {
+            const repos = createDefaultMockRepos()
+            repos.articleRepo = createMockArticleRepository([])
+            const app = createTestApp(repos)
+
+            const response = await app.request('/search_by_everything?q=not-found-keyword')
+
+            expect(response.status).toBe(200)
+            const json = await response.json() as { message: string, data: Article[] }
+            expect(json.message).toBe('No articles found')
+            expect(json.data).toEqual([])
+        })
+    })
 })
 // ==================== 統合テスト（実DB使用） ====================
 // 統合テストはDBを共有するため順次実行
@@ -304,6 +349,64 @@ describe('routes/web/article 統合テスト', () => {
             const json = await response.json() as { message: string, data: Actor[] }
             // console.log('アクターレスポンス:', JSON.stringify(json, null, 2))
             expect(json.data).toHaveLength(2)
+        })
+    })
+
+    describe('GET /search_by_everything', () => {
+        it('タグ名・アクター名でも記事検索できること', async () => {
+            await createArticleFactory({
+                title: '基礎記事A',
+                explanation: 'タグと俳優の説明A',
+                tags: ['TypeScript'],
+                actors: ['山田太郎']
+            })
+            await createArticleFactory({
+                title: '別記事',
+                explanation: '説明B',
+                tags: ['JavaScript'],
+                actors: ['佐藤花子']
+            })
+
+            const app = createIntegrationTestApp()
+
+            const byTagResponse = await app.request('/search_by_everything?q=TypeScript')
+            expect(byTagResponse.status).toBe(200)
+            const byTagJson = await byTagResponse.json() as { message: string, data: Article[] }
+            expect(byTagJson.data.map(a => a.title)).toContain('基礎記事A')
+
+            const byActorResponse = await app.request('/search_by_everything?q=山田太郎')
+            expect(byActorResponse.status).toBe(200)
+            const byActorJson = await byActorResponse.json() as { message: string, data: Article[] }
+            expect(byActorJson.data.map(a => a.title)).toContain('基礎記事A')
+        })
+
+        it('複数条件でAND検索できること', async () => {
+            await createArticleFactory({
+                title: '複合条件対象1',
+                explanation: '説明A',
+                tags: ['TypeScript'],
+                actors: ['山田太郎']
+            })
+            await createArticleFactory({
+                title: '複合条件対象2',
+                explanation: '説明B',
+                tags: ['TypeScript'],
+                actors: ['佐藤花子']
+            })
+
+            const app = createIntegrationTestApp()
+
+            const hitResponse = await app.request('/search_by_everything?q=TypeScript%20山田太郎')
+            expect(hitResponse.status).toBe(200)
+            const hitJson = await hitResponse.json() as { message: string, data: Article[] }
+            expect(hitJson.data.map(a => a.title)).toEqual(expect.arrayContaining(['複合条件対象1']))
+            expect(hitJson.data.map(a => a.title)).not.toContain('複合条件対象2')
+
+            const missResponse = await app.request('/search_by_everything?q=TypeScript%20存在しない俳優')
+            expect(missResponse.status).toBe(200)
+            const missJson = await missResponse.json() as { message: string, data: Article[] }
+            expect(missJson.message).toBe('No articles found')
+            expect(missJson.data).toEqual([])
         })
     })
 })

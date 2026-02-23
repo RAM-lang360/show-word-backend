@@ -25,7 +25,18 @@ webArticle.get('/all_tag', async (c) => {
 })
 
 webArticle.get('/search_by_everything', async (c) => {
-    
+    const keyword = c.req.query('q')?.trim() ?? ''
+    if (!keyword) {
+        return c.json({ message: 'query "q" is required', data: [] }, 400)
+    }
+
+    const repo = c.get('articleRepo')
+    const searched_articles = await repo.findByKeyword(keyword)
+    if (searched_articles.length === 0) {
+        return c.json({ message: 'No articles found', data: [] })
+    }
+
+    return c.json({ message: 'This is searched articles', data: searched_articles })
 })
 
 

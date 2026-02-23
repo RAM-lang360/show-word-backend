@@ -48,6 +48,57 @@ export class PrismaArticleRepository implements ArticleRepository {
     }
     // ひらがなから全体検索をするメソッド
     async findByKeyword(keyword: string): Promise<Article[]> {
-        return [];
+        const tokens = keyword
+            .split(/[\s\u3000]+/)
+            .map((token) => token.trim())
+            .filter((token) => token.length > 0);
+
+        if (tokens.length === 0) {
+            return [];
+        }
+
+        const toCrossFieldOrCondition = (token: string) => ({
+            OR: [
+                { title: { contains: token, mode: 'insensitive' as const } },
+                { explanation: { contains: token, mode: 'insensitive' as const } },
+                {
+                    tags: {
+                        some: {
+                            tag: {
+                                name: { contains: token, mode: 'insensitive' as const }
+                            }
+                        }
+                    }
+                },
+                {
+                    actors: {
+                        some: {
+                            actor: {
+                                actor_name: { contains: token, mode: 'insensitive' as const }
+                            }
+                        }
+                    }
+                },
+                {
+                    actors: {
+                        some: {
+                            actor: {
+                                actor_kana: { contains: token, mode: 'insensitive' as const }
+                            }
+                        }
+                    }
+                }
+            ]
+        });
+
+        const records = await this.prisma.article.findMany({
+            where: {
+                published: true,
+                AND: tokens.map((token) => toCrossFieldOrCondition(token))
+            },
+            orderBy: { id: 'desc' }
+        });
+
+        return records.map((item) => this.toEntity(item));
     }
-}   
+}
