@@ -184,7 +184,7 @@ describe('routes/web/article', () => {
 })
 // ==================== 統合テスト（実DB使用） ====================
 // 統合テストはDBを共有するため順次実行
-describe.sequential('routes/web/article 統合テスト', () => {
+describe('routes/web/article 統合テスト', () => {
     // 実際のPrismaリポジトリを使用するアプリ
     const createIntegrationTestApp = () => {
         const app = new Hono<Env>()
