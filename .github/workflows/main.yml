@@ -31,7 +31,7 @@ jobs:
 
       - name: Install pg_bigm in CI
         run: |
-          docker exec -u root ${{ job.services.postgres.id }} bash -lc "apt-get update && apt-get install -y git build-essential postgresql-server-dev-15"
+          docker exec -u root ${{ job.services.postgres.id }} bash -lc "apt-get update && apt-get install -y git build-essential postgresql-server-dev-15 libicu-dev"
           docker exec -u root ${{ job.services.postgres.id }} bash -lc "rm -rf /tmp/pg_bigm && git clone --depth=1 https://github.com/pgbigm/pg_bigm.git /tmp/pg_bigm"
           docker exec -u root ${{ job.services.postgres.id }} bash -lc "cd /tmp/pg_bigm && make USE_PGXS=1 && make USE_PGXS=1 install"
           docker exec ${{ job.services.postgres.id }} psql -U user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_bigm;"
